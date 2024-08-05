@@ -42,6 +42,12 @@
 
             console.log('Filtered Data:', df);
 
+            // Print the first and last rows of the filtered data
+            if (df.length > 0) {
+                console.log('First Row:', df[0]);
+                console.log('Last Row:', df[df.length - 1]);
+            }
+
             const x = money - Math.max(20, money * 0.001425);
             let asset = 0;
             let assetStock = 0;
