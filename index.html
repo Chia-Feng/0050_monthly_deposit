@@ -129,8 +129,8 @@
             }
 
             document.getElementById('result').innerHTML = '';
-            newList.forEach(result => {
-                document.getElementById('result').innerHTML += `今日總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%<br>`;
+            newList.forEach((result, index) => {
+                document.getElementById('result').innerHTML += `存款${index+1}年後: 總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%<br>`;
             });
         }
     </script>
