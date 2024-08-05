@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinese Currency Converter</title>
-    <script src="papaparse.min.js"></script>
-    <script src="dayjs.min.js"></script>
-    <script src="customParseFormat.js"></script>
+    <script src="js/papaparse.min.js"></script>
+    <script src="js/dayjs.min.js"></script>
+    <script src="js/customParseFormat.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             console.log('PapaParse version:', Papa.VERSION);
@@ -47,6 +47,31 @@
             let assetStock = 0;
             let cost = 0;
 
+            const targetDays = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+            const filteredRows = [];
+
+            // Grouping data by year and month
+            const grouped = df.reduce((acc, row) => {
+                const yearMonth = row.Date.format('YYYY-MM');
+                if (!acc[yearMonth]) {
+                    acc[yearMonth] = [];
+                }
+                acc[yearMonth].push(row);
+                return acc;
+            }, {});
+
+            // Filtering rows based on the day
+            for (const key in grouped) {
+                const group = grouped[key];
+                let selectedRow;
+                for (const targetDay of targetDays) {
+                    selectedRow = group.find(row => row.Date.date() === targetDay);
+                    if (selectedRow) break;
+                }
+                if (selectedRow) filteredRows.push(selectedRow);
+            }
+
+            // Calculations for daily deposits
             df.forEach(row => {
                 const adjClose = row['Adj Close'];
                 if (row.Date.date() === day) {
