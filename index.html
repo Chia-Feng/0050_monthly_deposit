@@ -8,6 +8,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/dayjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/plugin/customParseFormat.min.js"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log('PapaParse version:', Papa.VERSION);
+        });
+
         dayjs.extend(window.dayjs_plugin_customParseFormat);
 
         function convertToChineseCurrency(number) {
