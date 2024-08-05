@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chinese Currency Converter</title>
+    <title>台灣元大0050大盤月存回報率計算</title>
     <script src="papaparse.min.js"></script>
     <script src="dayjs.min.js"></script>
     <script src="customParseFormat.js"></script>
@@ -18,10 +18,6 @@
         .result {
             font-size: 1.5em;
             margin-top: 20px;
-        }
-        .result span {
-            display: block;
-            margin-top: 10px;
         }
     </style>
     <script>
@@ -46,7 +42,7 @@
             }
         }
 
-        function dailyDeposit(year, day, money = 100, csvData) {
+        function dailyDeposit(year, day=4, money = 100, csvData) {
             const days = year * 244;
             const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
             console.log('Parsed Data:', parsedData);
@@ -88,11 +84,9 @@
                 let selectedRow;
                 for (let targetDay = day; targetDay <= 31; targetDay++) {
                     selectedRow = group.find(row => row.Date.date() === targetDay);
-                    if (selectedRow) {
-                        filteredRows.push(selectedRow);
-                        break;
-                    }
+                    if (selectedRow) break;
                 }
+                if (selectedRow) filteredRows.push(selectedRow);
             }
 
             // Print the first and last row of the filtered rows
@@ -123,45 +117,28 @@
             return [finalAsset, finalCost, profit, profitPercent];
         }
 
-        function calculateYearlyReturns(year, day, money, csvData) {
-            const results = [];
-            for (let i = 1; i <= year; i++) {
-                const currentYearData = csvData.slice(-(i * 244), -(i - 1) * 244);
-                const result = dailyDeposit(1, day, money, currentYearData);
-                results.push(result);
-            }
-            return results;
-        }
-
         async function loadCSVAndCalculate() {
             const url = 'https://raw.githubusercontent.com/Chia-Feng/0050_monthly_deposit/main/0050_daily_16year.csv';
             const response = await fetch(url);
             const csvData = await response.text();
-
+            
             const year = parseInt(document.getElementById('yearInput').value);
             const day = parseInt(document.getElementById('dayInput').value);
             const money = parseFloat(document.getElementById('moneyInput').value);
-
-            const results = calculateYearlyReturns(year, day, money, csvData);
-
-            let resultText = '';
-            results.forEach((result, index) => {
-                resultText += `Year ${index + 1}: Asset: ${result[0]}, Cost: ${result[1]}, Profit: ${result[2]}, Profit Percent: ${result[3]}%<br>`;
-            });
-
-            document.getElementById('result').innerHTML = resultText;
+            const result = dailyDeposit(year, day, money, csvData);
+            document.getElementById('result').innerText = `今日總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%`;
         }
     </script>
 </head>
 <body>
-    <h1>Chinese Currency Converter</h1>
-    <label class="input-label" for="yearInput">年:</label>
+    <h1>台灣元大0050大盤月存回報率計算</h1>
+    <label class="input-label" for="yearInput">回測幾年:</label>
     <input type="number" id="yearInput" placeholder="Enter years">
-    <label class="input-label" for="dayInput">日期:</label>
+    <label class="input-label" for="dayInput">每月定存日:</label>
     <input type="number" id="dayInput" placeholder="Enter day of the month">
-    <label class="input-label" for="moneyInput">金額:</label>
+    <label class="input-label" for="moneyInput">每月定存金額(台幣):</label>
     <input type="number" id="moneyInput" placeholder="Enter money">
     <button onclick="loadCSVAndCalculate()">Calculate</button>
-    <p class="result">Result: <span id="result"></span></p>
+    <p class="result">回測結果:<br><span id="result"></span></p>
 </body>
 </html>
