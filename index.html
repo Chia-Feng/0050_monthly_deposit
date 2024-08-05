@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chinese Currency Converter</title>
+    <title>台灣元大0050大盤月存回報率計算</title>
     <script src="papaparse.min.js"></script>
     <script src="dayjs.min.js"></script>
     <script src="customParseFormat.js"></script>
@@ -42,7 +42,7 @@
             }
         }
 
-        function dailyDeposit(year, day, money = 100, csvData) {
+        function dailyDeposit(year, day=4, money = 100, csvData) {
             const days = year * 244;
             const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
             console.log('Parsed Data:', parsedData);
@@ -131,14 +131,14 @@
     </script>
 </head>
 <body>
-    <h1>Chinese Currency Converter</h1>
-    <label class="input-label" for="yearInput">年:</label>
+    <h1>台灣元大0050大盤月存回報率計算</h1>
+    <label class="input-label" for="yearInput">回測幾年:</label>
     <input type="number" id="yearInput" placeholder="Enter years">
-    <label class="input-label" for="dayInput">日期:</label>
+    <label class="input-label" for="dayInput">每月定存日:</label>
     <input type="number" id="dayInput" placeholder="Enter day of the month">
-    <label class="input-label" for="moneyInput">金額:</label>
+    <label class="input-label" for="moneyInput">每月定存金額(台幣):</label>
     <input type="number" id="moneyInput" placeholder="Enter money">
     <button onclick="loadCSVAndCalculate()">Calculate</button>
-    <p class="result">Result: <span id="result"></span></p>
+    <p class="result">計算結果: <span id="result"></span></p>
 </body>
 </html>
