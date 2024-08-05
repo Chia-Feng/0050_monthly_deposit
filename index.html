@@ -128,6 +128,11 @@
             const day = parseInt(document.getElementById('dayInput').value);
             const money = parseFloat(document.getElementById('moneyInput').value);
 
+            const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
+            const lastDate = dayjs(parsedData[parsedData.length - 1].Date, 'YYYY-MM-DD');
+            const lastYear = lastDate.year();
+            const lastMonth = lastDate.month() + 1; // month() returns 0-11
+            
             const newList = [];
 
             for (let i = 0; i < year; i++) {
@@ -136,7 +141,7 @@
 
             document.getElementById('result').innerHTML = '';
             newList.reverse().forEach((result, index) => {
-                document.getElementById('result').innerHTML += `${2024-index}年: 總資產: ${result[0].padStart(10, ' ')} 總花費: ${result[1].padStart(10, ' ')} 總獲利: ${result[2].padStart(10, ' ')} 獲利百分比: ${result[3].toString().padStart(4, ' ')}%\n`;
+                document.getElementById('result').innerHTML += `${lastYear-year+index}年 ${lastMonth}月: 總資產: ${result[0].padStart(10, ' ')} 總花費: ${result[1].padStart(10, ' ')} 總獲利: ${result[2].padStart(10, ' ')} 獲利百分比: ${result[3].toString().padStart(4, ' ')}%\n`;
             });
         }
     </script>
