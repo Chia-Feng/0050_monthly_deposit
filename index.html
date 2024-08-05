@@ -44,7 +44,7 @@
 
         function dailyDeposit(year, to_year, day = 4, money = 100, csvData) {
             const days = year * 244;
-            const to_days = to_year * 244;
+            const to_days = Math.max(to_year * 244,1);
             const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
             console.log('Parsed Data:', parsedData);
 
