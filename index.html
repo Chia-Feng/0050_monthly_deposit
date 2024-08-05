@@ -130,7 +130,7 @@
 
             document.getElementById('result').innerHTML = '';
             newList.forEach((result, index) => {
-                document.getElementById('result').innerHTML += `存款${index+1}年後: 總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%<br>`;
+                document.getElementById('result').innerHTML += `存款${index+1}年後: 總資產: ${result[0].padStart(10, ' ')} 總花費: ${result[1].padStart(10, ' ')} 總獲利: ${result[2].padStart(10, ' ')} 獲利百分比: ${result[3].toString().padStart(4, ' ')}%\n`;
             });
         }
     </script>
