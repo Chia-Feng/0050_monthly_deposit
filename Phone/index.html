@@ -1,1 +1,156 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣元大0050大盤月存回報率計算</title>
+    <script src="papaparse.min.js"></script>
+    <script src="dayjs.min.js"></script>
+    <script src="customParseFormat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .input-label {
+            display: block;
+            margin-top: 10px;
+        }
+        .result {
+            font-size: 1.5em;
+            margin-top: 20px;
+            font-family: 'Courier New', Courier, monospace; /* 使用等寬字體 */
+            white-space: pre; /* 保留空格 */
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log('PapaParse version:', Papa.VERSION);
+        });
+
+        dayjs.extend(window.dayjs_plugin_customParseFormat);
+
+        function convertToChineseCurrency(number) {
+            const integerPart = Math.floor(number);
+            if (integerPart >= 10000) {
+                const wanPart = Math.floor(integerPart / 10000);
+                const remainderPart = integerPart % 10000;
+                if (remainderPart === 0) {
+                    return `${wanPart}萬元`;
+                } else {
+                    return `${wanPart}萬${remainderPart}元`;
+                }
+            } else {
+                return `${integerPart}元`;
+            }
+        }
+
+        function dailyDeposit(year, to_year, day = 4, money = 100, csvData) {
+            const days = year * 244;
+            const to_days = Math.max(to_year * 244,1);
+            const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
+            console.log('Parsed Data:', parsedData);
+
+            let df = parsedData.slice(-days, -to_days);
+            df = df.map(row => {
+                row.Date = dayjs(row.Date, 'YYYY-MM-DD');
+                return row;
+            });
+
+            console.log('Filtered Data:', df);
+
+            if (df.length > 0) {
+                console.log('First row of filtered data:', df[0]);
+                console.log('Last row of filtered data:', df[df.length - 1]);
+            }
+
+            const x = money - Math.max(20, money * 0.001425);
+            let asset = 0;
+            let assetStock = 0;
+            let cost = 0;
+
+            const filteredRows = [];
+
+            const grouped = df.reduce((acc, row) => {
+                const yearMonth = row.Date.format('YYYY-MM');
+                if (!acc[yearMonth]) {
+                    acc[yearMonth] = [];
+                }
+                acc[yearMonth].push(row);
+                return acc;
+            }, {});
+
+            for (const key in grouped) {
+                const group = grouped[key];
+                let selectedRow;
+                for (let targetDay = day; targetDay <= 31; targetDay++) {
+                    selectedRow = group.find(row => row.Date.date() === targetDay);
+                    if (selectedRow) break;
+                }
+                if (selectedRow) filteredRows.push(selectedRow);
+            }
+
+            if (filteredRows.length % 12 > 0) {
+                filteredRows.shift();
+            }
+
+            if (filteredRows.length > 0) {
+                console.log('First row of final filtered rows:', filteredRows[0]);
+                console.log('Last row of final filtered rows:', filteredRows[filteredRows.length - 1]);
+            }
+
+            filteredRows.forEach(row => {
+                const adjClose = row['Adj Close'];
+                assetStock += x / adjClose;
+                cost += money;
+                asset = assetStock * adjClose;
+            });
+
+            console.log('Final Asset Stock:', assetStock);
+            console.log('Final Asset:', asset);
+            console.log('Total Cost:', cost);
+
+            const finalAsset = convertToChineseCurrency(Math.round(asset));
+            const finalCost = convertToChineseCurrency(Math.round(cost));
+            const profit = convertToChineseCurrency(Math.round(asset - cost));
+            const profitPercent = Math.round((asset - cost) / cost * 100);
+
+            console.log('Results:', [finalAsset, finalCost, profit, profitPercent]);
+
+            return [finalAsset, finalCost, profit, profitPercent];
+        }
+
+        async function loadCSVAndCalculate() {
+            const url = 'https://raw.githubusercontent.com/Chia-Feng/0050_monthly_deposit/main/0050_daily_16year.csv';
+            const response = await fetch(url);
+            const csvData = await response.text();
+            
+            const year = parseInt(document.getElementById('yearInput').value);
+            const day = parseInt(document.getElementById('dayInput').value);
+            const money = parseFloat(document.getElementById('moneyInput').value);
+
+            const newList = [];
+
+            for (let i = 0; i < year; i++) {
+                newList.push(dailyDeposit(year, year-1-i, day, money, csvData));
+            }
+
+            document.getElementById('result').innerHTML = '';
+            newList.forEach((result, index) => {
+                document.getElementById('result').innerHTML += `存款${index+1}年後: 總資產: ${result[0].padStart(10, ' ')} 總花費: ${result[1].padStart(10, ' ')} 總獲利: ${result[2].padStart(10, ' ')} 獲利百分比: ${result[3].toString().padStart(4, ' ')}%\n`;
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>台灣元大0050大盤月存回報率計算</h1>
+    <label class="input-label" for="yearInput">回測幾年:</label>
+    <input type="number" id="yearInput" placeholder="Enter years">
+    <label class="input-label" for="dayInput">每月定存日:</label>
+    <input type="number" id="dayInput" placeholder="Enter day of the month">
+    <label class="input-label" for="moneyInput">每月定存金額(台幣):</label>
+    <input type="number" id="moneyInput" placeholder="Enter money">
+    <button onclick="loadCSVAndCalculate()">計算</button>
+    <p class="result">回測結果:<br><span id="result"></span></p>
+</body>
+</html>
