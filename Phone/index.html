@@ -1,13 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>台灣元大0050大盤月存回報率計算</title>
-    <script src="papaparse.min.js"></script>
-    <script src="dayjs.min.js"></script>
-    <script src="customParseFormat.js"></script>
+    <script src="../papaparse.min.js"></script>
+    <script src="../dayjs.min.js"></script>
+    <script src="../customParseFormat.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -121,7 +120,7 @@
         }
 
         async function loadCSVAndCalculate() {
-            const url = 'https://raw.githubusercontent.com/Chia-Feng/0050_monthly_deposit/main/0050_daily_16year.csv';
+            const url = '../0050_daily_16year.csv';
             const response = await fetch(url);
             const csvData = await response.text();
             
@@ -137,7 +136,7 @@
 
             document.getElementById('result').innerHTML = '';
             newList.forEach((result, index) => {
-                document.getElementById('result').innerHTML += `存款${index+1}年後: 總資產: ${result[0].padStart(10, ' ')} 總花費: ${result[1].padStart(10, ' ')} 總獲利: ${result[2].padStart(10, ' ')} 獲利百分比: ${result[3].toString().padStart(4, ' ')}%\n`;
+                document.getElementById('result').innerHTML += `存款${index+1}年後:\n總資產:\n${result[0]}\n總花費:\n${result[1]}\n總獲利:\n${result[2]}\n獲利百分比:\n${result[3]}%\n`;
             });
         }
     </script>
@@ -150,7 +149,7 @@
     <input type="number" id="dayInput" placeholder="Enter day of the month">
     <label class="input-label" for="moneyInput">每月定存金額(台幣):</label>
     <input type="number" id="moneyInput" placeholder="Enter money">
-    <button onclick="loadCSVAndCalculate()">計算</button>
+    <button onclick="loadCSVAndCalculate()">Calculate</button>
     <p class="result">回測結果:<br><span id="result"></span></p>
 </body>
 </html>
