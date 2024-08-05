@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>`台灣0050每月定存獲利`</title>
+    <title>台灣0050每月定存獲利</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/dayjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/plugin/customParseFormat.min.js"></script>
@@ -25,7 +25,7 @@
             }
         }
 
-        function dailyDeposit(year, day, money = 100, csvData) {
+        function dailyDeposit(year, day=4, money = 100, csvData) {
             const days = year * 244;
             const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
             let df = parsedData.slice(-days);
@@ -62,7 +62,7 @@
             const csvData = await response.text();
             
             const year = parseInt(document.getElementById('yearInput').value);
-            const day = parseInt(document.getElementById('dayInput').value);
+            const day = 4;
             const money = parseFloat(document.getElementById('moneyInput').value);
             const result = dailyDeposit(year, day, money, csvData);
             document.getElementById('result').innerText = `Asset: ${result[0]}, Cost: ${result[1]}, Profit: ${result[2]}, Profit Percent: ${result[3]}%`;
@@ -70,9 +70,8 @@
     </script>
 </head>
 <body>
-    <h1>Chinese Currency Converter</h1>
+    <h1>台灣0050每月定存獲利</h1>
     <input type="number" id="yearInput" placeholder="Enter years">
-    <input type="number" id="dayInput" placeholder="Enter day of the month">
     <input type="number" id="moneyInput" placeholder="Enter money">
     <button onclick="loadCSVAndCalculate()">Calculate</button>
     <p>Result: <span id="result"></span></p>
