@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台灣元大0050大盤月存回報率計算</title>
+    <title>Chinese Currency Converter</title>
     <script src="papaparse.min.js"></script>
     <script src="dayjs.min.js"></script>
     <script src="customParseFormat.js"></script>
@@ -18,6 +18,10 @@
         .result {
             font-size: 1.5em;
             margin-top: 20px;
+        }
+        .result span {
+            display: block;
+            margin-top: 10px;
         }
     </style>
     <script>
@@ -42,7 +46,7 @@
             }
         }
 
-        function dailyDeposit(year, day=4, money = 100, csvData) {
+        function dailyDeposit(year, day, money = 100, csvData) {
             const days = year * 244;
             const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
             console.log('Parsed Data:', parsedData);
@@ -55,66 +59,63 @@
 
             console.log('Filtered Data:', df);
 
-            // Print the first and last row of the filtered data
-            if (df.length > 0) {
-                console.log('First row of filtered data:', df[0]);
-                console.log('Last row of filtered data:', df[df.length - 1]);
-            }
+            const results = [];
+            for (let y = 1; y <= year; y++) {
+                const yearStart = days - (y * 244);
+                const yearEnd = days - ((y - 1) * 244);
+                const yearlyData = df.slice(yearStart, yearEnd);
 
-            const x = money - Math.max(20, money * 0.001425);
-            let asset = 0;
-            let assetStock = 0;
-            let cost = 0;
+                console.log(`Year ${y} Data:`, yearlyData);
 
-            const filteredRows = [];
+                const x = money - Math.max(20, money * 0.001425);
+                let asset = 0;
+                let assetStock = 0;
+                let cost = 0;
 
-            // Grouping data by year and month
-            const grouped = df.reduce((acc, row) => {
-                const yearMonth = row.Date.format('YYYY-MM');
-                if (!acc[yearMonth]) {
-                    acc[yearMonth] = [];
+                const filteredRows = [];
+
+                // Grouping data by year and month
+                const grouped = yearlyData.reduce((acc, row) => {
+                    const yearMonth = row.Date.format('YYYY-MM');
+                    if (!acc[yearMonth]) {
+                        acc[yearMonth] = [];
+                    }
+                    acc[yearMonth].push(row);
+                    return acc;
+                }, {});
+
+                // Filtering rows based on the day
+                for (const key in grouped) {
+                    const group = grouped[key];
+                    let selectedRow;
+                    for (let targetDay = day; targetDay <= 31; targetDay++) {
+                        selectedRow = group.find(row => row.Date.date() === targetDay);
+                        if (selectedRow) break;
+                    }
+                    if (selectedRow) filteredRows.push(selectedRow);
                 }
-                acc[yearMonth].push(row);
-                return acc;
-            }, {});
 
-            // Filtering rows based on the day
-            for (const key in grouped) {
-                const group = grouped[key];
-                let selectedRow;
-                for (let targetDay = day; targetDay <= 31; targetDay++) {
-                    selectedRow = group.find(row => row.Date.date() === targetDay);
-                    if (selectedRow) break;
-                }
-                if (selectedRow) filteredRows.push(selectedRow);
+                console.log(`Filtered Rows for Year ${y}:`, filteredRows);
+
+                // Calculations for daily deposits
+                filteredRows.forEach(row => {
+                    const adjClose = row['Adj Close'];
+                    assetStock += x / adjClose;
+                    cost += money;
+                    asset = assetStock * adjClose;
+                });
+
+                const finalAsset = convertToChineseCurrency(Math.round(asset));
+                const finalCost = convertToChineseCurrency(Math.round(cost));
+                const profit = convertToChineseCurrency(Math.round(asset - cost));
+                const profitPercent = Math.round((asset - cost) / cost * 100);
+
+                console.log(`Results for Year ${y}:`, [finalAsset, finalCost, profit, profitPercent]);
+
+                results.push(`Year ${y}: Asset: ${finalAsset}, Cost: ${finalCost}, Profit: ${profit}, Profit Percent: ${profitPercent}%`);
             }
 
-            // Print the first and last row of the filtered rows
-            if (filteredRows.length > 0) {
-                console.log('First row of final filtered rows:', filteredRows[0]);
-                console.log('Last row of final filtered rows:', filteredRows[filteredRows.length - 1]);
-            }
-
-            // Calculations for daily deposits
-            filteredRows.forEach(row => {
-                const adjClose = row['Adj Close'];
-                assetStock += x / adjClose;
-                cost += money;
-                asset = assetStock * adjClose;
-            });
-
-            console.log('Final Asset Stock:', assetStock);
-            console.log('Final Asset:', asset);
-            console.log('Total Cost:', cost);
-
-            const finalAsset = convertToChineseCurrency(Math.round(asset));
-            const finalCost = convertToChineseCurrency(Math.round(cost));
-            const profit = convertToChineseCurrency(Math.round(asset - cost));
-            const profitPercent = Math.round((asset - cost) / cost * 100);
-
-            console.log('Results:', [finalAsset, finalCost, profit, profitPercent]);
-
-            return [finalAsset, finalCost, profit, profitPercent];
+            return results;
         }
 
         async function loadCSVAndCalculate() {
@@ -125,20 +126,20 @@
             const year = parseInt(document.getElementById('yearInput').value);
             const day = parseInt(document.getElementById('dayInput').value);
             const money = parseFloat(document.getElementById('moneyInput').value);
-            const result = dailyDeposit(year, day, money, csvData);
-            document.getElementById('result').innerText = `今日總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%`;
+            const results = dailyDeposit(year, day, money, csvData);
+            document.getElementById('result').innerHTML = results.join('<br>');
         }
     </script>
 </head>
 <body>
-    <h1>台灣元大0050大盤月存回報率計算</h1>
-    <label class="input-label" for="yearInput">回測幾年:</label>
+    <h1>Chinese Currency Converter</h1>
+    <label class="input-label" for="yearInput">年:</label>
     <input type="number" id="yearInput" placeholder="Enter years">
-    <label class="input-label" for="dayInput">每月定存日:</label>
+    <label class="input-label" for="dayInput">日期:</label>
     <input type="number" id="dayInput" placeholder="Enter day of the month">
-    <label class="input-label" for="moneyInput">每月定存金額(台幣):</label>
+    <label class="input-label" for="moneyInput">金額:</label>
     <input type="number" id="moneyInput" placeholder="Enter money">
     <button onclick="loadCSVAndCalculate()">Calculate</button>
-    <p class="result">回測結果:<br><span id="result"></span></p>
+    <p class="result">Result: <span id="result"></span></p>
 </body>
 </html>
