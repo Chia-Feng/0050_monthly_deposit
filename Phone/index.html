@@ -141,7 +141,7 @@
 
             document.getElementById('result').innerHTML = '';
             newList.reverse().forEach((result, index) => {
-                document.getElementById('result').innerHTML += `${lastYear-year+index}年 ${lastMonth}月:\n總資產:\n${result[0]}\n總花費:\n${result[1]}\n總獲利:\n${result[2]}\n獲利百分比:\n${result[3]}%\n\n`;
+                document.getElementById('result').innerHTML += `${lastYear-index}年 ${lastMonth}月:\n總資產:\n${result[0]}\n總花費:\n${result[1]}\n總獲利:\n${result[2]}\n獲利百分比:\n${result[3]}%\n\n`;
             });
         }
     </script>
