@@ -7,6 +7,19 @@
     <script src="papaparse.min.js"></script>
     <script src="dayjs.min.js"></script>
     <script src="customParseFormat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .input-label {
+            display: block;
+            margin-top: 10px;
+        }
+        .result {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+    </style>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             console.log('PapaParse version:', Papa.VERSION);
@@ -42,10 +55,10 @@
 
             console.log('Filtered Data:', df);
 
-            // Print the first and last rows of the filtered data
+            // Print the first and last row of the filtered data
             if (df.length > 0) {
-                console.log('First Row:', df[0]);
-                console.log('Last Row:', df[df.length - 1]);
+                console.log('First row of filtered data:', df[0]);
+                console.log('Last row of filtered data:', df[df.length - 1]);
             }
 
             const x = money - Math.max(20, money * 0.001425);
@@ -74,6 +87,12 @@
                     if (selectedRow) break;
                 }
                 if (selectedRow) filteredRows.push(selectedRow);
+            }
+
+            // Print the first and last row of the filtered rows
+            if (filteredRows.length > 0) {
+                console.log('First row of final filtered rows:', filteredRows[0]);
+                console.log('Last row of final filtered rows:', filteredRows[filteredRows.length - 1]);
             }
 
             // Calculations for daily deposits
@@ -113,10 +132,13 @@
 </head>
 <body>
     <h1>Chinese Currency Converter</h1>
+    <label class="input-label" for="yearInput">年:</label>
     <input type="number" id="yearInput" placeholder="Enter years">
+    <label class="input-label" for="dayInput">日期:</label>
     <input type="number" id="dayInput" placeholder="Enter day of the month">
+    <label class="input-label" for="moneyInput">金額:</label>
     <input type="number" id="moneyInput" placeholder="Enter money">
     <button onclick="loadCSVAndCalculate()">Calculate</button>
-    <p>Result: <span id="result"></span></p>
+    <p class="result">Result: <span id="result"></span></p>
 </body>
 </html>
