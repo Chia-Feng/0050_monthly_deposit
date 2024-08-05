@@ -79,23 +79,20 @@
             return [finalAsset, finalCost, profit, profitPercent];
         }
 
-        function loadCSVAndCalculate() {
-            const fileInput = document.getElementById('csvFileInput');
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const csvData = e.target.result;
-                const year = parseInt(document.getElementById('yearInput').value);
-                const money = parseFloat(document.getElementById('moneyInput'  ).value);
-                const result = dailyDeposit(year, money, false, 4, csvData);
-                document.getElementById('result').innerText = `Asset: ${result[0]}, Cost: ${result[1]}, Profit: ${result[2]}, Profit Percent: ${result[3]}%`;
-            };
-            reader.readAsText(fileInput.files[0]);
+        async function loadCSVAndCalculate() {
+            const url = 'https://raw.githubusercontent.com/Chia-Feng/0050_monthly_deposit/main/0050_daily_16year.csv';
+            const response = await fetch(url);
+            const csvData = await response.text();
+            
+            const year = parseInt(document.getElementById('yearInput').value);
+            const money = parseFloat(document.getElementById('moneyInput').value);
+            const result = dailyDeposit(year, money, false, 4, csvData);
+            document.getElementById('result').innerText = `Asset: ${result[0]}, Cost: ${result[1]}, Profit: ${result[2]}, Profit Percent: ${result[3]}%`;
         }
     </script>
 </head>
 <body>
     <h1>Chinese Currency Converter</h1>
-    <input type="file" id="csvFileInput" accept=".csv">
     <input type="number" id="yearInput" placeholder="Enter years">
     <input type="number" id="moneyInput" placeholder="Enter money">
     <button onclick="loadCSVAndCalculate()">Calculate</button>
