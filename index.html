@@ -42,12 +42,13 @@
             }
         }
 
-        function dailyDeposit(year, day=4, money = 100, csvData) {
+        function dailyDeposit(year, to_year, day = 4, money = 100, csvData) {
             const days = year * 244;
+            const to_days = to_year * 244;
             const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
             console.log('Parsed Data:', parsedData);
 
-            let df = parsedData.slice(-days);
+            let df = parsedData.slice(-days, -to_days);
             df = df.map(row => {
                 row.Date = dayjs(row.Date, 'YYYY-MM-DD');
                 return row;
@@ -55,7 +56,6 @@
 
             console.log('Filtered Data:', df);
 
-            // Print the first and last row of the filtered data
             if (df.length > 0) {
                 console.log('First row of filtered data:', df[0]);
                 console.log('Last row of filtered data:', df[df.length - 1]);
@@ -68,7 +68,6 @@
 
             const filteredRows = [];
 
-            // Grouping data by year and month
             const grouped = df.reduce((acc, row) => {
                 const yearMonth = row.Date.format('YYYY-MM');
                 if (!acc[yearMonth]) {
@@ -78,7 +77,6 @@
                 return acc;
             }, {});
 
-            // Filtering rows based on the day
             for (const key in grouped) {
                 const group = grouped[key];
                 let selectedRow;
@@ -89,13 +87,11 @@
                 if (selectedRow) filteredRows.push(selectedRow);
             }
 
-            // Print the first and last row of the filtered rows
             if (filteredRows.length > 0) {
                 console.log('First row of final filtered rows:', filteredRows[0]);
                 console.log('Last row of final filtered rows:', filteredRows[filteredRows.length - 1]);
             }
 
-            // Calculations for daily deposits
             filteredRows.forEach(row => {
                 const adjClose = row['Adj Close'];
                 assetStock += x / adjClose;
@@ -125,8 +121,17 @@
             const year = parseInt(document.getElementById('yearInput').value);
             const day = parseInt(document.getElementById('dayInput').value);
             const money = parseFloat(document.getElementById('moneyInput').value);
-            const result = dailyDeposit(year, day, money, csvData);
-            document.getElementById('result').innerText = `今日總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%`;
+
+            const newList = [];
+
+            for (let i = 0; i < year; i++) {
+                newList.push(dailyDeposit(year, year-1-i, day, money, csvData));
+            }
+
+            document.getElementById('result').innerHTML = '';
+            newList.forEach(result => {
+                document.getElementById('result').innerHTML += `今日總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%<br>`;
+            });
         }
     </script>
 </head>
