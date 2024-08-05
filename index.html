@@ -126,7 +126,7 @@
             const day = parseInt(document.getElementById('dayInput').value);
             const money = parseFloat(document.getElementById('moneyInput').value);
             const result = dailyDeposit(year, day, money, csvData);
-            document.getElementById('result').innerText = `Asset: ${result[0]}, Cost: ${result[1]}, Profit: ${result[2]}, Profit Percent: ${result[3]}%`;
+            document.getElementById('result').innerText = `今日總資產: ${result[0]}, 總花費: ${result[1]}, 總獲利: ${result[2]}, 獲利百分比: ${result[3]}%`;
         }
     </script>
 </head>
