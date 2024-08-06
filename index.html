@@ -125,7 +125,7 @@
             const csvData = await response.text();
             
             const year = parseInt(document.getElementById('yearInput').value);
-            const day = 4 //parseInt(document.getElementById('dayInput').value);
+            const day = 15 //parseInt(document.getElementById('dayInput').value);
             const money = parseFloat(document.getElementById('moneyInput').value);
 
             const parsedData = Papa.parse(csvData, { header: true, dynamicTyping: true }).data;
